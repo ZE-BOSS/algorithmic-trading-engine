@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: smc_postgres
+    environment:
+      POSTGRES_USER: smc_user
+      POSTGRES_PASSWORD: smc_password
+      POSTGRES_DB: smc_trading
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smc_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: smc_engine
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://smc_user:smc_password@postgres:5432/smc_trading
+      LIVE_TRADING: "false"
+    volumes:
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+      - ./sample_data:/app/sample_data
+      - ./configs:/app/configs
+    command: tail -f /dev/null  # Keep container running
+
+volumes:
+  postgres_data:

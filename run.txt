@@ -1,0 +1,5 @@
+cd Music/smc-trading-engine
+
+python -m smc_engine.main backtest --strategy smc --symbol EURUSD --timeframe H1 --start 2020-01-01 --end 2022-12-31 --params configs/smc_params.json --initial_balance 10000 --data_source mt5
+
+python -m smc_engine.main optimize --param_space configs/param_space.json --objective sharpe_ratio --trials 200 --method optuna --strategy smc --symbol EURUSDm --timeframe M15 --start 2020-01-01 --end 2022-12-31 --data_source mt5
